@@ -29,19 +29,13 @@ for cube in obsidian:
             air.add(o)
 
 # anything outside of this is for sure air and not a pocket
-min_x, max_x = obsidian[0][0], obsidian[0][0] 
-min_y, max_y = obsidian[0][1], obsidian[0][1]
-min_z, max_z = obsidian[0][2], obsidian[0][2]
-for d in obsidian[1:]:
-    min_x = min(min_x, d[0])
-    max_x = max(max_x, d[0])
-    min_y = min(min_y, d[1])
-    max_y = max(max_y, d[1])
-    min_z = min(min_z, d[2])
-    max_z = max(max_z, d[2])
-min_x, max_x = min_x - 1, max_x + 1
-min_y, max_y = min_y - 1, max_y + 1
-min_z, max_z = min_z - 1, max_z + 1
+Xs = [o[0] for o in obsidian]
+Ys = [o[1] for o in obsidian]
+Zs = [o[2] for o in obsidian]
+min_x, max_x = min(Xs), max(Xs)
+min_y, max_y = min(Ys), max(Ys)
+min_z, max_z = min(Zs), max(Zs)
+
 
 def check_pocket(start, memory, visited):
     # depth first search
