@@ -61,24 +61,19 @@ fn main() {
                     let (next, unused) = unused_positions.iter()
                         .fold((&mut tmp_next_pos, &mut tmp_unused_pos), |(next_pos, not_used), pos_range| {
                             let (start, n) = (pos_range[0], pos_range[1]);
-                            if start > range_end || start + n - 1 < ranges[1] {  // outside of current range
+                            let pos_end = start + n - 1;
+                            let higher_start = std::cmp::max(ranges[1], start);
+
+                            if start > range_end || pos_end < ranges[1] {  // outside of current range
                                 not_used.push(vec![start, n]);
-                            }
-                            else if start >= ranges[1] {  // starts inside
-                                if start + n - 1 <= range_end {  // fully inside
-                                    next_pos.push(vec![ranges[0] + start - ranges[1], n]);
-                                } else {  // ends after
-                                    next_pos.push(vec![ranges[0] + start - ranges[1], range_end - start + 1]);
-                                    not_used.push(vec![range_end + 1, start + n - range_end]);
+                            } else {
+                                let overlap = std::cmp::min(range_end, pos_end) - higher_start + 1;
+                                next_pos.push(vec![ranges[0] + start.saturating_sub(ranges[1]), overlap]);
+                                if start < ranges[1] {
+                                    not_used.push(vec![start, ranges[1] - start]);
                                 }
-                            } else {  // start before
-                                if start + n - 1 <= range_end {  // ends inside
-                                    next_pos.push(vec![ranges[0], start + n - ranges[1]]);
-                                    not_used.push(vec![start, ranges[1] - start]);
-                                } else {  // ends after
-                                    next_pos.push(vec![ranges[0], ranges[2]]);
-                                    not_used.push(vec![start, ranges[1] - start]);
-                                    not_used.push(vec![range_end + 1, start + n - range_end]);
+                                if pos_end > range_end {
+                                    not_used.push(vec![range_end + 1, pos_end - range_end]);
                                 }
                             }
                             (next_pos, not_used)
